@@ -2,7 +2,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.Properties;
+import javax.swing.table.DefaultTableModel;
 
 public class DatabaseConnection {
     private Connection con;
@@ -15,7 +17,8 @@ public class DatabaseConnection {
         String url = "jdbc:oracle:thin:@(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=gaa80506deb0bc2_tutpfyjjx4ysrfb2_high.adb.oraclecloud.com))(security=(ssl_server_cert_dn=\"CN=adb.sa-santiago-1.oraclecloud.com, O=Oracle Corporation, L=Redwood City, ST=California, C=US\")))";
         properties.setProperty("user", "UL20201684");
         properties.setProperty("password", "ULima20201684#");
-        properties.setProperty("javax.net.ssl.keyStore", "C:\\Users\\QUINONES\\Desktop\\Ingeniería de Datos\\Documentos\\SQL Developer\\wallet_tutpfyjjx4ysrfb2");
+        properties.setProperty("javax.net.ssl.keyStore","C:\\Users\\QUINONES\\Desktop\\Ingeniería de Datos\\Documentos\\SQL Developer\\wallet_tutpfyjjx4ysrfb2");
+        
         try {
             con = DriverManager.getConnection(url, properties);
         }
@@ -25,66 +28,91 @@ public class DatabaseConnection {
         ps = null;
         rs = null;
     }
-    
-    public int countColumns(String table_name) {
+        
+    public String[] getColumnNames (String table_name) {
         try {
-            String qry = "SELECT COUNT(*) FROM all_tab_columns WHERE OWNER = 'UL20203864' AND table_name = '" + table_name + "'";
+            String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
             ps = con.prepareStatement(qry);
             rs = ps.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int column_count = rsmd.getColumnCount();
             
-            while(rs.next()) {
-                return rs.getInt(1);
+            String[] column_names = new String[column_count];
+            for(int i=0; i<column_count; i++) {
+                column_names[i] = rsmd.getColumnName(i+1);
             }
+            
+            return column_names;
         }
         catch(Exception ex) {
             System.out.println(ex);
         }
         
-        return 0;
+        return null;
     }
     
-    public void selectAll(String table_name) {
+    public void populateComboBox(javax.swing.JComboBox<String> jComboBox1) {
         try {
-            int column_count = this.countColumns(table_name);
+            String qry = "SELECT table_name  FROM all_tables WHERE OWNER = 'UL20203864'";
+            ps = con.prepareStatement(qry);
+            rs = ps.executeQuery();
             
+            while(rs.next()) {
+                    jComboBox1.addItem(rs.getString(1));
+                }
+            }
+        catch(Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    public void populateTable(String table_name, DefaultTableModel tableModel) {
+        try {
             String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
             ps = con.prepareStatement(qry);
             rs = ps.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int column_count = rsmd.getColumnCount();
             
+            Object[] data = new Object[column_count];
             while(rs.next()) {
                 for(int i=0; i<column_count; i++) {
-                    System.out.print(rs.getString(i+1) + "\t");
+                    data[i] = rs.getString(i+1);
                 }
-                System.out.print("\b\n");
+                tableModel.addRow(data);
             }
-            System.out.println();
         }
         catch(Exception ex) {
             System.out.println(ex);
         }
     }
     
-    public void selectColumn(String table_name, String column_name) {
+    public void returnColumn(String table_name, String column_name, DefaultTableModel tableModel) {
         try {
-            String qry = "SELECT " + column_name + " FROM UL20203864." + table_name;
+            String qry = "SELECT " + column_name + " FROM UL20203864." + table_name + " ORDER BY 1 ASC";
             ps = con.prepareStatement(qry);
             rs = ps.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int column_count = rsmd.getColumnCount();
             
+            Object[] data = new Object[column_count];
             while(rs.next()) {
-                System.out.println(rs.getString(1));
+                for(int i=0; i<column_count; i++) {
+                    data[i] = rs.getString(i+1);
+                }
+                tableModel.addRow(data);
             }
-            System.out.println();
         }
         catch(Exception ex) {
             System.out.println(ex);
         }
     }
     
-    public void insertInto(int id, String fname, String lname) {
+    public void insertInto(String table_name, int id, String fname, String lname) {
         try {
-            String qry = "INSERT INTO EMPLOYEES VALUES (?, ?, ?)";
+            String qry = "INSERT INTO UL20203864." + table_name + " VALUES (?, ?, ?)";
             ps = con.prepareStatement(qry);
-            
+           
             ps.setString(1, Integer.toString(id));
             ps.setString(2, fname);
             ps.setString(3, lname);
@@ -97,12 +125,6 @@ public class DatabaseConnection {
     }
     
     public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
         DatabaseConnection db = new DatabaseConnection();
-        System.out.println("Tiempo de establecimiento de conexión a la base de datos: " + (System.currentTimeMillis() - startTime) / 1000 + " segundo(s)\n");
-        
-        db.selectAll("FACULTAD");
-        //db.insertInto(5, "César", "Rosales");
-        db.selectColumn("FACULTAD", "nombre_facultad");
     }
 }
