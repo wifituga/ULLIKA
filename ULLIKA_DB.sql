@@ -1,179 +1,182 @@
+CREATE TABLE alumnos (
+    id_alumnos    NUMBER(8) NOT NULL,
+    nombre_alumno VARCHAR2(200 CHAR) NOT NULL,
+    id_carrera    NUMBER(2) NOT NULL
+);
+
+ALTER TABLE alumnos ADD CONSTRAINT alumnos_pk PRIMARY KEY ( id_alumnos );
+
 CREATE TABLE caracter (
-    caracter CHAR(1 CHAR) NOT NULL
+    id_caracter     CHAR(1 CHAR) NOT NULL,
+    nombre_caracter VARCHAR2(20 CHAR) NOT NULL
 );
 
-ALTER TABLE caracter ADD CONSTRAINT caracter_pk PRIMARY KEY ( caracter );
+ALTER TABLE caracter ADD CONSTRAINT caracter_pk PRIMARY KEY ( id_caracter );
 
-CREATE TABLE carrera (
-    id_carrera     NUMBER(2) NOT NULL,
-    nombre_carrera VARCHAR2(50 CHAR) NOT NULL,
-    id_facultad    VARCHAR2(5 CHAR) NOT NULL
+CREATE TABLE carreras (
+    id_carrera       NUMBER(2) NOT NULL,
+    nombre_carrera   VARCHAR2(100 CHAR) NOT NULL,
+    id_facultad      VARCHAR2(10 CHAR) NOT NULL,
+    id_plan_estudios VARCHAR2(10 CHAR) NOT NULL
 );
 
-ALTER TABLE carrera ADD CONSTRAINT carrera_pk PRIMARY KEY ( id_carrera );
+CREATE UNIQUE INDEX carreras__idx ON
+    carreras (
+        id_plan_estudios
+    ASC );
+
+ALTER TABLE carreras ADD CONSTRAINT carreras_pk PRIMARY KEY ( id_carrera );
 
 CREATE TABLE ciclo (
-    cod_ciclo VARCHAR2(5 CHAR) NOT NULL
+    id_ciclo VARCHAR2(20 CHAR) NOT NULL
 );
 
-ALTER TABLE ciclo ADD CONSTRAINT ciclo_pk PRIMARY KEY ( cod_ciclo );
-
-CREATE TABLE cicloclase (
-    cod_clase NUMBER(6) NOT NULL,
-    cod_ciclo VARCHAR2(5 CHAR) NOT NULL
-);
-
-ALTER TABLE cicloclase ADD CONSTRAINT cicloclase_pk PRIMARY KEY ( cod_clase,
-                                                                  cod_ciclo );
-
-CREATE TABLE clase (
-    cod_clase        NUMBER(6) NOT NULL,
-    cod_curso NUMBER(15) NOT NULL
-);
-
-ALTER TABLE clase ADD CONSTRAINT clase_pk PRIMARY KEY ( cod_clase );
+ALTER TABLE ciclo ADD CONSTRAINT ciclo_pk PRIMARY KEY ( id_ciclo );
 
 CREATE TABLE cursos (
-    cod_curso    NUMBER(15) NOT NULL,
-    nombre_curso VARCHAR2(100 CHAR) NOT NULL,
-    creditos     NUMBER(1) NOT NULL,
-    id_plan      VARCHAR2(10 CHAR) NOT NULL,
-    cod_curso1   NUMBER(15) NULL,
-    cod_curso2   NUMBER(15) NULL,
-    caracter     CHAR(1 CHAR) NOT NULL,
-    nivel  NUMBER(2) NOT NULL
+    cod_curso        NUMBER(10) NOT NULL,
+    nombre_curso     VARCHAR2(100 CHAR) NOT NULL,
+    id_caracter      CHAR(1 CHAR) NOT NULL,
+    id_nivel         NUMBER(2) NOT NULL,
+    id_plan_estudios VARCHAR2(10 CHAR) NOT NULL,
+    cod_curso1        NUMBER(10) NULL,
+    cod_curso2       NUMBER(10) NULL,
+    CREDITOS        NUMBER(1) NOT NULL
 );
-
-ALTER TABLE CURSOS
-    MODIFY NOMBRE_CURSO VARCHAR2(100 CHAR);
-
+    
 ALTER TABLE cursos ADD CONSTRAINT cursos_pk PRIMARY KEY ( cod_curso );
 
-CREATE TABLE estudclase (
-    cod_clase      NUMBER(6) NOT NULL,
-    cod_estudiante NUMBER(8) NOT NULL
+CREATE TABLE cursos_alumnos (
+    id_cursos_alumnos NUMBER(20) NOT NULL,
+    id_alumnos        NUMBER(8) NOT NULL,
+    cod_curso         NUMBER(10) NOT NULL,
+    id_ciclo          VARCHAR2(20 CHAR) NOT NULL,
+    id_seccion        NUMBER(10) NOT NULL
 );
 
-ALTER TABLE estudclase ADD CONSTRAINT estudclase_pk PRIMARY KEY ( cod_clase,
-                                                                  cod_estudiante );
+ALTER TABLE cursos_alumnos ADD CONSTRAINT cursos_alumnos_pk PRIMARY KEY ( id_cursos_alumnos );
 
-CREATE TABLE estudiante (
-    cod_estudiante       NUMBER(8) NOT NULL,
-    nombre_estudiante    VARCHAR2(30 CHAR) NOT NULL,
-    apellidop_estudiante VARCHAR2(30 CHAR) NOT NULL,
-    apellidom_estudiante VARCHAR2(30 CHAR) NOT NULL,
+CREATE TABLE facultades (
+    id_facultad     VARCHAR2(10 CHAR) NOT NULL,
+    nombre_facultad VARCHAR2(100 CHAR) NOT NULL
+);
+
+ALTER TABLE facultades ADD CONSTRAINT facultades_pk PRIMARY KEY ( id_facultad );
+
+CREATE TABLE niveles (
+    id_nivel     NUMBER(2) NOT NULL,
+    nombre_nivel VARCHAR2(50 CHAR) NOT NULL
+);
+
+ALTER TABLE niveles ADD CONSTRAINT niveles_pk PRIMARY KEY ( id_nivel );
+
+CREATE TABLE plan_estudios (
+    id_plan_estudios     VARCHAR2(10 CHAR) NOT NULL,
+    nombre_plan_estudios VARCHAR2(100 CHAR) NOT NULL,
     id_carrera           NUMBER(2) NOT NULL
 );
 
-ALTER TABLE estudiante ADD CONSTRAINT estudiante_pk PRIMARY KEY ( cod_estudiante );
+CREATE UNIQUE INDEX plan_estudios__idx ON
+    plan_estudios (
+        id_carrera
+    ASC );
 
-CREATE TABLE facultad (
-    id_facultad     VARCHAR2(5 CHAR) NOT NULL,
-    nombre_facultad VARCHAR2(50 CHAR) NOT NULL
+ALTER TABLE plan_estudios ADD CONSTRAINT plan_estudios_pk PRIMARY KEY ( id_plan_estudios );
+
+CREATE TABLE prof_cursos (
+    id_prof_cursos NUMBER(20) NOT NULL,
+    cod_profesor   NUMBER(8) NOT NULL,
+    cod_curso      NUMBER(10) NOT NULL
 );
 
-ALTER TABLE facultad ADD CONSTRAINT facultad_pk PRIMARY KEY ( id_facultad );
+ALTER TABLE prof_cursos ADD CONSTRAINT profesores_cursos_pk PRIMARY KEY ( id_prof_cursos );
 
-CREATE TABLE nivel (
-    nivel NUMBER(2) NOT NULL
+CREATE TABLE profesores (
+    cod_profesor    NUMBER(8) NOT NULL,
+    nombre_profesor VARCHAR2(100 CHAR) NOT NULL
 );
 
-ALTER TABLE nivel ADD CONSTRAINT nivel_pk PRIMARY KEY ( nivel );
+ALTER TABLE profesores ADD CONSTRAINT profesores_pk PRIMARY KEY ( cod_profesor );
 
-CREATE TABLE plan_estudios (
-    id_plan     VARCHAR2(10 CHAR) NOT NULL,
-    nombre_plan VARCHAR2(100 CHAR) NOT NULL
+CREATE TABLE seccion (
+    id_seccion NUMBER(10) NOT NULL
 );
 
-ALTER TABLE plan_estudios ADD CONSTRAINT plan_estudios_pk PRIMARY KEY ( id_plan );
+ALTER TABLE seccion ADD CONSTRAINT seccion_pk PRIMARY KEY ( id_seccion );
 
-CREATE TABLE profcur (
-    cod_curso    NUMBER(15) NOT NULL,
-    cod_profesor NUMBER(6) NOT NULL
+CREATE TABLE valoraciones (
+    id_valoraciones NUMBER(10) NOT NULL,
+    comentario      VARCHAR2(500 CHAR),
+    id_alumnos      NUMBER(8) NOT NULL,
+    cod_profesor    NUMBER(8) NOT NULL
 );
 
-ALTER TABLE profcur ADD CONSTRAINT profcur_pk PRIMARY KEY ( cod_curso,
-                                                            cod_profesor );
+ALTER TABLE valoraciones ADD CONSTRAINT valoraciones_pk PRIMARY KEY ( id_valoraciones );
 
-CREATE TABLE profesor (
-    cod_profesor       NUMBER(6) NOT NULL,
-    nombre_profesor    VARCHAR2(30 CHAR) NOT NULL,
-    apellidop_profesor VARCHAR2(30 CHAR) NOT NULL,
-    apellidom_profesor VARCHAR2(30 CHAR) NOT NULL
-);
+ALTER TABLE alumnos
+    ADD CONSTRAINT alumnos_carreras_fk FOREIGN KEY ( id_carrera )
+        REFERENCES carreras ( id_carrera );
 
-ALTER TABLE profesor ADD CONSTRAINT profesor_pk PRIMARY KEY ( cod_profesor );
+ALTER TABLE carreras
+    ADD CONSTRAINT carreras_facultades_fk FOREIGN KEY ( id_facultad )
+        REFERENCES facultades ( id_facultad );
 
-CREATE TABLE valoracion (
-    puntaje        NUMBER(2),
-    cod_estudiante NUMBER(8) NOT NULL,
-    cod_profesor   NUMBER(6) NOT NULL
-);
+ALTER TABLE carreras
+    ADD CONSTRAINT carreras_plan_estudios_fk FOREIGN KEY ( id_plan_estudios )
+        REFERENCES plan_estudios ( id_plan_estudios );
 
-ALTER TABLE valoracion ADD CONSTRAINT valoracion_pk PRIMARY KEY ( cod_estudiante,
-                                                                  cod_profesor );
+ALTER TABLE cursos_alumnos
+    ADD CONSTRAINT cursos_alumnos_alumnos_fk FOREIGN KEY ( id_alumnos )
+        REFERENCES alumnos ( id_alumnos );
 
-ALTER TABLE carrera
-    ADD CONSTRAINT carrera_facultad_fk FOREIGN KEY ( id_facultad )
-        REFERENCES facultad ( id_facultad );
+ALTER TABLE cursos_alumnos
+    ADD CONSTRAINT cursos_alumnos_ciclo_fk FOREIGN KEY ( id_ciclo )
+        REFERENCES ciclo ( id_ciclo );
 
-ALTER TABLE cicloclase
-    ADD CONSTRAINT cicloclase_ciclo_fk FOREIGN KEY ( cod_ciclo )
-        REFERENCES ciclo ( cod_ciclo );
-
-ALTER TABLE cicloclase
-    ADD CONSTRAINT cicloclase_clase_fk FOREIGN KEY ( cod_clase )
-        REFERENCES clase ( cod_clase );
-
-ALTER TABLE clase
-    ADD CONSTRAINT clase_cursos_fk FOREIGN KEY ( cod_curso )
+ALTER TABLE cursos_alumnos
+    ADD CONSTRAINT cursos_alumnos_cursos_fk FOREIGN KEY ( cod_curso )
         REFERENCES cursos ( cod_curso );
 
-ALTER TABLE cursos
-    ADD CONSTRAINT cursos_caracter_fk FOREIGN KEY ( caracter )
-        REFERENCES caracter ( caracter );
+ALTER TABLE cursos_alumnos
+    ADD CONSTRAINT cursos_alumnos_seccion_fk FOREIGN KEY ( id_seccion )
+        REFERENCES seccion ( id_seccion );
 
 ALTER TABLE cursos
-    ADD CONSTRAINT cursos_cursos_fk FOREIGN KEY ( cod_curso1 )
+    ADD CONSTRAINT cursos_caracter_fk FOREIGN KEY ( id_caracter )
+        REFERENCES caracter ( id_caracter );
+        
+ALTER TABLE cursos
+    ADD CONSTRAINT cursos_CURSO1_fk FOREIGN KEY ( COD_CURSO1 )
+        REFERENCES CURSOS ( COD_CURSO);
+
+ALTER TABLE cursos
+    ADD CONSTRAINT cursos_CURSO2_fk FOREIGN KEY ( COD_CURSO2 )
+        REFERENCES CURSOS ( COD_CURSO);
+
+ALTER TABLE cursos
+    ADD CONSTRAINT cursos_niveles_fk FOREIGN KEY ( id_nivel )
+        REFERENCES niveles ( id_nivel );
+
+ALTER TABLE cursos
+    ADD CONSTRAINT cursos_plan_estudios_fk FOREIGN KEY ( id_plan_estudios )
+        REFERENCES plan_estudios ( id_plan_estudios );
+
+ALTER TABLE plan_estudios
+    ADD CONSTRAINT plan_estudios_carreras_fk FOREIGN KEY ( id_carrera )
+        REFERENCES carreras ( id_carrera );
+
+ALTER TABLE prof_cursos
+    ADD CONSTRAINT prof_cursos_cursos_fk FOREIGN KEY ( cod_curso )
         REFERENCES cursos ( cod_curso );
 
-ALTER TABLE cursos
-    ADD CONSTRAINT cursos_cursos_fkv2 FOREIGN KEY ( cod_curso2 )
-        REFERENCES cursos ( cod_curso );
+ALTER TABLE prof_cursos
+    ADD CONSTRAINT prof_cursos_profesores_fk FOREIGN KEY ( cod_profesor )
+        REFERENCES profesores ( cod_profesor );
 
-ALTER TABLE cursos
-    ADD CONSTRAINT cursos_nivel_fk FOREIGN KEY ( nivel_nivel )
-        REFERENCES nivel ( nivel );
+ALTER TABLE valoraciones
+    ADD CONSTRAINT valoraciones_alumnos_fk FOREIGN KEY ( id_alumnos )
+        REFERENCES alumnos ( id_alumnos );
 
-ALTER TABLE cursos
-    ADD CONSTRAINT cursos_plan_estudios_fk FOREIGN KEY ( id_plan )
-        REFERENCES plan_estudios ( id_plan );
-
-ALTER TABLE estudclase
-    ADD CONSTRAINT estudclase_clase_fk FOREIGN KEY ( cod_clase )
-        REFERENCES clase ( cod_clase );
-
-ALTER TABLE estudclase
-    ADD CONSTRAINT estudclase_estudiante_fk FOREIGN KEY ( cod_estudiante )
-        REFERENCES estudiante ( cod_estudiante );
-
-ALTER TABLE estudiante
-    ADD CONSTRAINT estudiante_carrera_fk FOREIGN KEY ( id_carrera )
-        REFERENCES carrera ( id_carrera );
-
-ALTER TABLE profcur
-    ADD CONSTRAINT profcur_cursos_fk FOREIGN KEY ( cod_curso )
-        REFERENCES cursos ( cod_curso );
-
-ALTER TABLE profcur
-    ADD CONSTRAINT profcur_profesor_fk FOREIGN KEY ( cod_profesor )
-        REFERENCES profesor ( cod_profesor );
-
-ALTER TABLE valoracion
-    ADD CONSTRAINT valoracion_estudiante_fk FOREIGN KEY ( cod_estudiante )
-        REFERENCES estudiante ( cod_estudiante );
-
-ALTER TABLE valoracion
-    ADD CONSTRAINT valoracion_profesor_fk FOREIGN KEY ( cod_profesor )
-        REFERENCES profesor ( cod_profesor );
-
+ALTER TABLE valoraciones
+    ADD CONSTRAINT valoraciones_profesores_fk FOREIGN KEY ( cod_profesor )
+        REFERENCES profesores ( cod_profesor );
