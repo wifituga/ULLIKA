@@ -28,27 +28,19 @@ public class DatabaseConnection {
         ps = null;
         rs = null;
     }
-        
-    public String[] getColumnNames (String table_name) {
-        try {
-            String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
-            ps = con.prepareStatement(qry);
-            rs = ps.executeQuery();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int column_count = rsmd.getColumnCount();
-            
-            String[] column_names = new String[column_count];
-            for(int i=0; i<column_count; i++) {
-                column_names[i] = rsmd.getColumnName(i+1);
-            }
-            
-            return column_names;
-        }
-        catch(Exception ex) {
-            System.out.println(ex);
-        }
-        
-        return null;
+
+    public DatabaseConnection(boolean bool) {      
+        this.con = null;
+        this.ps = null;
+        this.rs = null;
+    }
+    
+    public Connection getCon() {
+        return con;
+    }
+
+    public void setCon(Connection con) {
+        this.con = con;
     }
     
     public void populateComboBox(javax.swing.JComboBox<String> jComboBox1) {
@@ -66,7 +58,7 @@ public class DatabaseConnection {
         }
     }
     
-    public void populateTable(String table_name, DefaultTableModel tableModel) {
+    public void populateTableViewTable(String table_name, DefaultTableModel tableModel) {
         try {
             String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
             ps = con.prepareStatement(qry);
@@ -74,6 +66,12 @@ public class DatabaseConnection {
             ResultSetMetaData rsmd = rs.getMetaData();
             int column_count = rsmd.getColumnCount();
             
+            // Cargar cabeceras
+            for(int i=0; i<column_count; i++) {
+                tableModel.addColumn(rsmd.getColumnName(i+1));
+            }
+            
+            // Cargar datos
             Object[] data = new Object[column_count];
             while(rs.next()) {
                 for(int i=0; i<column_count; i++) {
@@ -87,44 +85,65 @@ public class DatabaseConnection {
         }
     }
     
-    public void returnColumn(String table_name, String column_name, DefaultTableModel tableModel) {
+    public void populateDataInsertionTable(String table_name, DefaultTableModel tableModel) {
         try {
-            String qry = "SELECT " + column_name + " FROM UL20203864." + table_name + " ORDER BY 1 ASC";
+            String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
             ps = con.prepareStatement(qry);
             rs = ps.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
             int column_count = rsmd.getColumnCount();
             
+            // Cargar cabeceras
+            for(int i=0; i<column_count; i++) {
+                tableModel.addColumn(rsmd.getColumnName(i+1));
+            }
+            
+            // Cargar datos
             Object[] data = new Object[column_count];
+            for(int i=0; i<column_count; i++) {
+                data[i] = "";
+            }
+            tableModel.addRow(data);
+        }
+        catch(Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    public int getColumnCount(String table_name) {
+        try {
+            String qry = "SELECT * FROM UL20203864." + table_name + " ORDER BY 1 ASC";
+            ps = con.prepareStatement(qry);
+            rs = ps.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            
             while(rs.next()) {
-                for(int i=0; i<column_count; i++) {
-                    data[i] = rs.getString(i+1);
-                }
-                tableModel.addRow(data);
+                    return rsmd.getColumnCount();
             }
         }
         catch(Exception ex) {
             System.out.println(ex);
         }
+        
+        return 0;
     }
     
-    public void insertInto(String table_name, int id, String fname, String lname) {
+    public void insertInto(String table_name, DefaultTableModel tableModel) {
         try {
-            String qry = "INSERT INTO UL20203864." + table_name + " VALUES (?, ?, ?)";
-            ps = con.prepareStatement(qry);
-           
-            ps.setString(1, Integer.toString(id));
-            ps.setString(2, fname);
-            ps.setString(3, lname);
+            int column_count = this.getColumnCount(table_name);
             
+            String attrib = "";
+            for(int i=0; i<column_count; i++) {
+                attrib = attrib + "'" + tableModel.getValueAt(0, i).toString() + "', ";
+            }
+            attrib = attrib.substring(0, attrib.length() - 2);
+            
+            String qry = "INSERT INTO UL20203864." + table_name + " VALUES (" + attrib + ")";
+            ps = con.prepareStatement(qry);
             ps.executeUpdate();
         }
         catch(Exception ex) {
             System.out.println(ex);
         }
-    }
-    
-    public static void main(String[] args) {
-        DatabaseConnection db = new DatabaseConnection();
     }
 }
