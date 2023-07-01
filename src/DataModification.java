@@ -1,6 +1,8 @@
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
@@ -14,8 +16,16 @@ public class DataModification extends javax.swing.JFrame {
     public DataModification(Connection con, String table_name, String id) {
         initComponents();
         
-        // No terminar el programa al cerrar el frame
+        // No terminar el programa al cerrar el frame actual
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        // Crear y abrir un frame TableView al cerrrar el frame actual
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                backToTableView();
+            }
+        });
         
         // Inicializar modelo default de la tabla
         dataModModel = new DefaultTableModel();
@@ -42,6 +52,7 @@ public class DataModification extends javax.swing.JFrame {
         cancelarBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Modificar data");
 
         dataModTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -110,6 +121,12 @@ public class DataModification extends javax.swing.JFrame {
         db.populateDataModTable(table_name, dataModModel, id);
     }
     
+    private void backToTableView() {
+        TableView tableViewFrame = new TableView(db.getCon(), table_name);
+        super.dispose();
+        tableViewFrame.setVisible(true);
+    }
+    
     private void guardarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarBtnActionPerformed
         // Enforcar el cursos en otra columna para registrar los cambios
         try {
@@ -124,16 +141,11 @@ public class DataModification extends javax.swing.JFrame {
         
         // Modificar fila en la base de datos
         db.update(table_name, dataModModel, id);
-        
-        TableView tableViewFrame = new TableView(db.getCon(), table_name);
-        super.dispose();
-        tableViewFrame.setVisible(true);
+        backToTableView();
     }//GEN-LAST:event_guardarBtnActionPerformed
 
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
-        TableView tableViewFrame = new TableView(db.getCon(), table_name);
-        super.dispose();
-        tableViewFrame.setVisible(true);
+        backToTableView();
     }//GEN-LAST:event_cancelarBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

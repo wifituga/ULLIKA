@@ -18,7 +18,7 @@ public class DatabaseConnection {
         Properties properties = new Properties();        
         properties.setProperty("user", "UL20201684");
         properties.setProperty("password", "ULima20201684#");
-        properties.setProperty("javax.net.ssl.keyStore","C:\\Users\\QUINONES\\Desktop\\Ingeniería de Datos\\Documentos\\SQL Developer\\wallet_tutpfyjjx4ysrfb2");
+        properties.setProperty("javax.net.ssl.keyStore", "C:\\Users\\QUINONES\\Desktop\\Ingeniería de Datos\\Proyecto\\DBA Application\\cwallet.sso");
         
         try {
             con = DriverManager.getConnection(url, properties);

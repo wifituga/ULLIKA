@@ -69,6 +69,7 @@ public class TableView extends javax.swing.JFrame {
         editarBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Visualizar data");
 
         tableViewTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -178,14 +179,15 @@ public class TableView extends javax.swing.JFrame {
         public void itemStateChanged(ItemEvent event) {
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 updateTable();
-       }
+            }
+        }
     }
-}
     
     private void tableViewComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tableViewComboBoxActionPerformed
     }//GEN-LAST:event_tableViewComboBoxActionPerformed
 
     private void insertarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertarBtnActionPerformed
+        // Crear y abrir un frame DataInsertion
         DataInsertion dataInsFrame = new DataInsertion(db.getCon(), table_name);
         super.dispose();
         dataInsFrame.setVisible(true);
@@ -195,15 +197,18 @@ public class TableView extends javax.swing.JFrame {
         // Obtener la llave primaria del registro seleccionado
         String id = tableViewModel.getValueAt(tableViewTable.getSelectedRow(), 0).toString();
         
+        // Crear y abrir un frame DataModification, enviando como parámetro la llave primaria del registro seleccionado
         DataModification dataModFrame = new DataModification(db.getCon(), table_name, id);
         super.dispose();
         dataModFrame.setVisible(true);
     }//GEN-LAST:event_editarBtnActionPerformed
 
     private void eliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarBtnActionPerformed
+        // Obtener la llave primaria del registro seleccionado
         String id = tableViewModel.getValueAt(tableViewTable.getSelectedRow(), 0).toString();
-        db.delete(table_name, tableViewModel, id);
         
+        // Eliminar el registro seleccionado y actualizar la tabla
+        db.delete(table_name, tableViewModel, id);
         updateTable();
     }//GEN-LAST:event_eliminarBtnActionPerformed
     

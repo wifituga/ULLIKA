@@ -3,6 +3,8 @@ import java.awt.Robot;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
@@ -15,8 +17,16 @@ public class DataInsertion extends javax.swing.JFrame {
     public DataInsertion(Connection con, String table_name) {
         initComponents();
         
-        // No terminar el programa al cerrar el frame
+        // No terminar el programa al cerrar el frame actual
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        // Crear y abrir un frame TableView al cerrrar el frame actual
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                backToTableView();
+            }
+        });
         
         // Inicializar modelo default de la tabla
         dataInsModel = new DefaultTableModel();
@@ -50,6 +60,7 @@ public class DataInsertion extends javax.swing.JFrame {
         cancelarBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Insertar data");
 
         dataInsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -140,6 +151,12 @@ public class DataInsertion extends javax.swing.JFrame {
         }
     }
     
+    private void backToTableView() {
+        TableView tableViewFrame = new TableView(db.getCon(), table_name);
+        super.dispose();
+        tableViewFrame.setVisible(true);
+    }
+    
     private void dataInsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataInsComboBoxActionPerformed
 
     }//GEN-LAST:event_dataInsComboBoxActionPerformed
@@ -158,16 +175,11 @@ public class DataInsertion extends javax.swing.JFrame {
         
         // Insertar fila en la base de datos
         db.insertInto(table_name, dataInsModel);
-        
-        TableView tableViewFrame = new TableView(db.getCon(), table_name);
-        super.dispose();
-        tableViewFrame.setVisible(true);
+        backToTableView();
     }//GEN-LAST:event_guardarBtnActionPerformed
 
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
-        TableView tableViewFrame = new TableView(db.getCon(), table_name);
-        super.dispose();
-        tableViewFrame.setVisible(true);
+        backToTableView();
     }//GEN-LAST:event_cancelarBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
