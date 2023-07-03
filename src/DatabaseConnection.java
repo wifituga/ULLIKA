@@ -44,14 +44,14 @@ public class DatabaseConnection {
         this.con = con;
     }
     
-    public void populateComboBox(javax.swing.JComboBox<String> jComboBox1) {
+    public void populateComboBox(javax.swing.JComboBox<String> jComboBox) {
         try {
             String qry = "SELECT table_name  FROM all_tables WHERE owner = 'UL20203864'";
             ps = con.prepareStatement(qry);
             rs = ps.executeQuery();
             
             while(rs.next()) {
-                    jComboBox1.addItem(rs.getString(1));
+                    jComboBox.addItem(rs.getString(1));
             }
         }
         catch(Exception ex) {
